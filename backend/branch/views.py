@@ -6,7 +6,10 @@ from .models import  Market,User,City,Province,MarketOneTimeSlot
 from .serilizers import  MarketSerializer,UserSerializer,CitySerializer,ProvinceSerializer
 from django.db.models import Q
 from datetime import datetime
-
+from melipayamak import Api
+import jdatetime
+import os
+# RestApi = Api(os.getenv("sms_username"),os.getenv("sms_password")).sms()
 class MarketByCityView(GenericAPIView):
 	queryset = Market
 	def get(self,*args,**kwargs):
@@ -31,11 +34,15 @@ class MarketDetailView(RetrieveAPIView,UpdateAPIView):
 	serializer_class = MarketSerializer
 	def patch(self, request, *args, **kwargs):
 		pk = kwargs["pk"]
+		user = self.request.user
 		market = MarketOneTimeSlot.objects.get(id=pk)
 		totalReseveCount =market.totalReseve
 		currentReserve = market.reserveCount
+		date = market.date
+		formatedDate = jdatetime.fromgregorian(date.year,date.month,date.day)
 		if(currentReserve<totalReseveCount):
 			currentReserve+=1
+			# RestApi.send(user.phone_number,"0911111111",f"رزور شما در تاریخ {market.market.name} در مرکز {formatedDate} با موفقیت انجام شد")
 			market.save()
 			return Response({"data":"با موفقیت انجام شد"},status=status.HTTP_200_OK)
 		else:
