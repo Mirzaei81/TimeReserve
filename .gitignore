@@ -4,3 +4,4 @@ s.sql
 media/*
 migrations
 __pycache__
+.venv

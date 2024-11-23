@@ -20,7 +20,6 @@ from django.conf.urls.static import static
 from django.urls import path,include
 import branch.urls
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/",include(branch.urls.urlPattenrs))

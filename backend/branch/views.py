@@ -39,10 +39,10 @@ class MarketDetailView(RetrieveAPIView,UpdateAPIView):
 		totalReseveCount =market.totalReseve
 		currentReserve = market.reserveCount
 		date = market.date
-		formatedDate = jdatetime.fromgregorian(date.year,date.month,date.day)
+		formatedDate = jdatetime.date.fromgregorian(year=date.year,month=date.month,day=date.day)
 		if(currentReserve<totalReseveCount):
 			currentReserve+=1
-			# RestApi.send(user.phone_number,"0911111111",f"رزور شما در تاریخ {market.market.name} در مرکز {formatedDate} با موفقیت انجام شد")
+			# RestApi.send(user.username,"0911111111",f"رزور شما در تاریخ {market.market.name} در مرکز {formatedDate} با موفقیت انجام شد")
 			market.save()
 			return Response({"data":"با موفقیت انجام شد"},status=status.HTTP_200_OK)
 		else:
