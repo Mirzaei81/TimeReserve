@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query"
 import { MarketCard } from "./components/MarketCard"
 import {TailSpin} from "react-loader-spinner"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { useParams, useSearchParams } from "react-router-dom"
+import { useParams, useSearchParams,Link} from "react-router-dom"
+
 
 export interface IMarket{
   id: number
@@ -55,14 +56,21 @@ export  function Market(){
             )
     }
     return(
-        <div className="grid grid-cols-3 gap-64 grid-flow-col p-2">
-        {data?.map((v)=>
-            <>
-                <MarketCard  {...v} />
+        <>
+            {data?.length != 0 ? (
+                <div className="grid place-content-center grid-cols-3 gap-64 grid-flow-col p-2">
+                    {data?.map((v) =>
+                        <>
+                            <MarketCard  {...v} />
 
-            </>
-        )}
-        </div>
+                        </>)}
+                </div>
+            ) : <div className="h-full flex-col flex align-center justify-center">
+                    <div> متاسفانه در این زمان هیچ مرکزی پیدا نشد </div>
+                    <Link className="hover:text-purple-600 text-blue-600" to="/">بازگشت به صفحه جست و جو</Link>
+                </div>
+            }
+        </>
     )
 
 }

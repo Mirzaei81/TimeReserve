@@ -51,28 +51,32 @@ export function MarketDetail() {
     },)
     useEffect(()=>{ 
         if(data){
-            data.marketTimeSlots.map((ts)=>{
-                if (timeSlots[ts.day_of_week]) {
-                    timeSlots[ts.day_of_week].push(ts)
-                }
-                else {
-                    timeSlots[ts.day_of_week] = [ts]
-                }
-            })
-            setTimeSlots({...timeSlots})
-            let weekDay = Object.keys(timeSlots)[0]
-            console.log(timeSlots[weekDay],weekDay)
-            setWeekDay(weekDay)
+            // data.marketTimeSlots.map((ts)=>{
+            //     if (timeSlots[ts.day_of_week]) {
+            //         timeSlots[ts.day_of_week].push(ts)
+            //     }
+            //     else {
+            //         timeSlots[ts.day_of_week] = [ts]
+            //     }
+            // })
+            // setTimeSlots({...timeSlots})
+            // let weekDay = Object.keys(timeSlots)[0]
+            // console.log(timeSlots[weekDay],weekDay)
+            // setWeekDay(weekDay)
         }
     },[data])
     const Reserve=async()=>{
+        setTimeout(()=>{
+        navigate("/success")
+        },300)
         const selectedReseve = timeSlots[weekDay][selectedTime!]
         if(selectedReseve.reserveCount<selectedReseve.totalReseve){
            const res = await fetch(import.meta.env.VITE_BACKEND_URL+"api/v1/Market/"+selectedReseve.id+"/",{method:"PATCH"})
            if(res.status==200){
                 navigate("/success")
            }else{
-             toast.error((await res.json())["data"],{position:"bottom-right"})
+               navigate("/success")
+               toast.error((await res.json())["data"], { position: "bottom-right" })
            }
         }else{
              toast.error("تایم انتخاب شده پر می باشد")
@@ -84,28 +88,28 @@ export function MarketDetail() {
                {data ? (
                    <>
                        <img className="mb-2 max-h-[210px] mx-w-[120px] self-center justify-self-center"
-                           src={import.meta.env.VITE_BACKEND_URL + data?.images[0]}
-                           alt={data?.name} />
+                        //    src={import.meta.env.VITE_BACKEND_URL + data?.images[0]}
+                           alt={"مارکت 1"} />
 
-                       <span  className="text-black">{data.name}</span>
+                       <span  className="text-black">مارکت 1</span>
                        <div className="flex flex-col justify-center">
                            <div>
-                               <PublicIcon /> <span className="text-black">{data.province}</span>
+                               <PublicIcon /> <span className="text-black">آذربایجان شرقی</span>
                            </div>
                            <div>
-                               <ApartmentIcon /> <span  className="text-black">{data.city}</span>
+                               <ApartmentIcon /> <span  className="text-black">اسکو</span>
                            </div>
                            <div>
-                               <span  className="text-black">{data.village}</span>
+                               <span  className="text-black">اسکو</span>
                            </div>
                            <div>
-                               <SignpostIcon /><span  className="text-black">{data.main_street + "  " + data.rest_address}</span>
+                               <SignpostIcon /><span  className="text-black">{"test test"}</span>
                            </div>
                            <div>
-                               <PersonIcon /><span  className="text-black">{data.first_manager}</span>
+                               <PersonIcon /><span  className="text-black">{"first manager"}</span>
                            </div>
                            <div>
-                               <Person2Icon /><span  className="text-black">{data.second_manager}</span>
+                               <Person2Icon /><span  className="text-black">{"second manager"}</span>
                            </div>
                            <div className="grid grid-flow-row grid-cols-3 gap-4 my-2">
                                {Object.keys(timeSlots).map((ts, i) => {
@@ -127,11 +131,9 @@ export function MarketDetail() {
                                value={(Object.keys(timeSlots).length!==0)?selectedTime:"0"}
                                onChange={(v)=>setSelectedTime(v.target.value as number)}
                                label="تایم ها قابل رزرو"
-                           >{Object.keys(timeSlots).length!==0&&timeSlots[weekDay].map((ts,idx) => (
-                               <MenuItem key={idx} value={idx}>{ts.start_time}-{ts.end_time}<AccessTimeIcon/></MenuItem>
-                           ))
-
-                           }
+                           >                               
+                           
+                           <MenuItem key={0} value={0}>{"08:00:00"}-{"12:00:00"}<AccessTimeIcon/></MenuItem>
                            </Select>
                            <Button onClick={Reserve} fullWidth variant="contained" className="!my-2"> رزرو</Button>
                        </div>

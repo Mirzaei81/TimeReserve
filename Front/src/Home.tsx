@@ -20,7 +20,6 @@ interface ICity{
 interface IProvicne{
     id:number
     name:string
-    tel_prefix:string
     cities:ICity[]
 }
 interface IInputparams {
@@ -32,17 +31,25 @@ interface IInputparams {
     date?:string,
     time?:string,
 }
-
+const weekDays = [
+    'شنبه',
+    'یکشنبه',
+    'دوشنبه',
+    'سه‌شنبه',
+    'چهارشنبه',
+    'پنج‌شنبه',
+    'جمعه'
+]
 export function Home() {
-    const [inputParams,setInput] = useState<IInputparams>({byDate:false,byName:true})
+    const [inputParams,setInput] = useState<IInputparams>({byDate:false,byName:true,date:"شنبه"})
     const [MarketIdx,setMarketIdx] = useState(1)
     const [province,setProvince] = useState<IProvicne[]>([])
     const [provIdx,setProvIdx] = useState(0)
-    const [cityIdx,setCityIdx] = useState(1)
+    const [cityName,setCityName] = useState("اسکو")
     const {data:Markets,isPending} = useQuery({
-        queryKey: ["Market"+cityIdx],
+        queryKey: ["Market"+cityName],
         queryFn:async()=>{
-            const res = await fetch(import.meta.env.VITE_BACKEND_URL+"/api/v1/Market/City/"+cityIdx)
+            const res = await fetch(import.meta.env.VITE_BACKEND_URL+"/api/v1/Market/City/"+cityName)
             const data:IMarket[] = await res.json()
             return data
         }
@@ -65,8 +72,6 @@ export function Home() {
         if(inputParams.byName){
             navigate("/market-detail/" + MarketIdx) 
         }else{
-            console.log({ date: inputParams.date, time: inputParams.time })
-            console.log({ date: typeof(inputParams).date, time: inputParams.time?.toString() })
             navigate({pathname:"market/",search: createSearchParams({ date: inputParams.date!, time: inputParams.time!}).toString() })
         }
     }
@@ -82,11 +87,11 @@ export function Home() {
                     onChange={(e: SelectChangeEvent) => {
                         let provIdx =  parseInt(e.target.value)-1
                         setProvIdx(provIdx)
-                        setCityIdx(province[provIdx].cities[0].id)
+                        setCityName(province[provIdx].cities[0].name)
                         }
                     }
                 >
-                    {province && province.map((v, i) => (
+                    {province.length!=0 && province.map((v, i) => (
                         <MenuItem key={i} value={v.id}>{v.name}</MenuItem>
                     ))}
                 </Select>
@@ -96,14 +101,13 @@ export function Home() {
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="شهر"
-                    value={""+cityIdx}
+                    value={cityName}
                         onChange={(e: SelectChangeEvent) => {
-                            console.log(parseInt(e.target.value))
-                            setCityIdx(parseInt(e.target.value))
+                            setCityName(e.target.value)
                         }}
                 >
                     {province.length!=0 && province[provIdx].cities.map((v, i) => (
-                        <MenuItem key={i} value={v.id}>{v.name}</MenuItem>
+                        <MenuItem key={i} value={v.name}>{v.name}</MenuItem>
                     ))}
                 </Select>:<Skeleton style={{width:190,height:22}} variant="rounded"></Skeleton>
                 }
@@ -129,14 +133,17 @@ export function Home() {
                 </FormControl>
                 <div className={inputParams.byDate ? "display flex flex-col m-2" : "hide"}>
                     <LocalizationProvider localeText={faIR.components.MuiLocalizationProvider.defaultProps.localeText}  dateAdapter={AdapterMomentJalaali}>
-                        <MobileDatePicker className="!mb-3" label="تاریخ" onChange={(d) => {
-                            console.log(d?.toString())
-                            if (d) setInput({ ...inputParams, date: d.toDate().toUTCString() })
-                        }}
-                        />
+                        <Select id="demo-simple-select" label="روز" value={inputParams.date}
+                            onChange={(e: SelectChangeEvent) => {
+                                setInput({ ...inputParams, date: e.target.value })
+                            }}
+                        >{weekDays.map((v, i) => (
+                            <MenuItem key={i} value={v}>{v}</MenuItem>
+                        ))}
+
+                        </Select>
                             
-                        <MobileTimePicker label="زمان" onChange={(e) => {
-                            console.log(e?.toDate())
+                        <MobileTimePicker label="ساعت" onChange={(e) => {
                             setInput({ ...inputParams, time: e?.toDate().toUTCString() })
                         }} />
                     </LocalizationProvider>
