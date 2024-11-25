@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer,StringRelatedField,SlugRelatedField
-from .models import  Market,User,City,Province,MarketOneTimeSlot,MarketFeature1
+from .models import  Market,User,City,Province,MarketOneTimeSlot,MarketFeature2
 class MarketOneTimeSlotSerializer(ModelSerializer):
 	class Meta:
 		model=MarketOneTimeSlot
@@ -24,12 +24,11 @@ class MarketSerializer(ModelSerializer):
 	first_manager = StringRelatedField()
 	second_manager = StringRelatedField()
 	images = SlugRelatedField(read_only=True,slug_field="image__url",many=True)
-	marketTimeSlots = MarketOneTimeSlotSerializer(many=True)
 	city = StringRelatedField()
 	province = StringRelatedField()
-
+	h = SlugRelatedField(source="info",read_only=True,slug_field="h")
 	class Meta:
-		model =  Market
+		model = MarketFeature2
 		fields = ["id","uuid","name","province","city","village","first_manager","second_manager","landline_phone",
-			"main_street","rest_address","latitude","longitude","images","marketTimeSlots",
+			"main_street","rest_address","latitude","longitude","images","h"
 			]

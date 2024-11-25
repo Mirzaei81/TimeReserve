@@ -6917,11 +6917,12 @@ def main():
         province.save()
     for obj in list_of_cities:
         city = City()
-        city.name = obj.get('name')
-        prov = Province.objects.get(id=obj.get('province_id'))
-        city.province = prov
-        city.save()
+        try:
+          city.name = obj.get('name')
+          city.province_id = obj.get('province_id')
+          city.save()
+        except Exception as e:
+            print(obj) 
 
 # for obj in cities():
     # city = Cities
-

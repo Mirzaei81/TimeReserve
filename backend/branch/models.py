@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator,MinValueValidator,MaxValueValidator
 import uuid
+provinceChoise = [('آذربایجان شرقی', 'آذربایجان شرقی'), ('آذربایجان غربی', 'آذربایجان غربی'), ('اردبیل', 'اردبیل'), ('اصفهان', 'اصفهان'), ('البرز', 'البرز'), ('ایلام', 'ایلام'), ('بوشهر', 'بوشهر'), ('تهران', 'تهران'), ('چهارمحال و بختیاری', 'چهارمحال و بختیاری'), ('خراسان جنوبی', 'خراسان جنوبی'), ('خراسان رضوی', 'خراسان رضوی'), ('خراسان شمالی', 'خراسان شمالی'), ('خوزستان', 'خوزستان'), ('زنجان', 'زنجان'), ('سمنان', 'سمنان'), ('سیستان و بلوچستان', 'سیستان و بلوچستان'), ('فارس', 'فارس'), ('قزوین', 'قزوین'), ('قم', 'قم'), ('کردستان', 'کردستان'), ('کرمان', 'کرمان'), ('کرمانشاه', 'کرمانشاه'), ('کهگیلویه و بویراحمد', 'کهگیلویه و بویراحمد'), ('گلستان', 'گلستان'), ('لرستان', 'لرستان'), ('گیلان', 'گیلان'), ('مازندران', 'مازندران'), ('مرکزی', 'مرکزی'), ('هرمزگان', 'هرمزگان'), ('همدان', 'همدان'), ('یزد', 'یزد')]
 class MarketImages(models.Model):
     image = models.ImageField(upload_to='market/images')
     market = models.ForeignKey('Market', on_delete=models.CASCADE, related_name='images')
@@ -14,7 +15,7 @@ class Market(models.Model):
     ]# شما فقط نوع مارکت اول رو دارین کار میکنین. یعنی جستجو در این مدل فقط مارکتهایی است که تایپ آنها mo میباشد
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200, verbose_name='نام مارکت')
-    province = models.CharField(max_length=200, verbose_name='استان')
+    province = models.CharField(max_length=200, verbose_name='استان',choices=provinceChoise)
     city = models.CharField(max_length=200, verbose_name='شهر')
     village = models.CharField(max_length=200, verbose_name='روستا', null=True, blank=True)
     first_manager = models.ForeignKey('MarketManagers', related_name='market_one', on_delete=models.CASCADE,
@@ -84,6 +85,8 @@ class MarketManagers(models.Model):  #جدول مربوط به مسئول مار
     employee_market_id = models.IntegerField(blank=False, default=0)    
     class Meta:
         unique_together = ('phone_number', 'user_type','employee_market_id')
+    def __str__(self):
+        return self.first_name+" "+self.last_name
 
 class   MarketOneTimeSlot(models.Model):
     market1 = models.ForeignKey(MarketFeature2, on_delete=models.CASCADE, related_name='time_slots', verbose_name='مارکت اول')
