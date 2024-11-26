@@ -117,8 +117,8 @@ class   MarketOneTimeSlot(models.Model):
 
     def __str__(self):
         return f"{self.market1.name} - {self.day_of_week} ({self.start_time} - {self.end_time})"
-class MarketReserved(models.Model):
-    timeSlot = models.ForeignKey(MarketOneTimeSlot,on_delete=models.CASCADE)
+class MarketResevationCount(models.Model):
+    timeSlot = models.OneToOneField(MarketOneTimeSlot,related_name="counts",on_delete=models.CASCADE)
     count = models.IntegerField()
 
 class Province(models.Model):
@@ -141,7 +141,9 @@ class User(AbstractUser):
     province = models.ForeignKey(Province, on_delete=models.CASCADE, null=True, blank=True, verbose_name='استان')
     city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True, verbose_name='شهر')
     national_code = models.CharField(max_length=10, verbose_name='کد ملی')
-
+class MarketReserved(models.Model):
+    timeSlot = models.ForeignKey(MarketOneTimeSlot,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
 class SmsBodyId(models.Model):
     name = models.CharField(max_length=200)
     sms_panel_username = models.CharField(max_length=200)

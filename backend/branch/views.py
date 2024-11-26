@@ -2,54 +2,27 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from rest_framework.response  import Response
 from rest_framework.generics import GenericAPIView,ListAPIView,RetrieveAPIView,UpdateAPIView
-<<<<<<< HEAD
 from .models import  Market,User,City,Province,MarketOneTimeSlot,MarketReserved
 from .serilizers import  MarketSerializer,UserSerializer,CitySerializer,ProvinceSerializer
 from django.db.models import Q
-=======
-from .models import  Market,User,City,Province,MarketOneTimeSlot,MarketReserved,MarketFeature2
-from .serilizers import  MarketSerializer,UserSerializer,CitySerializer
->>>>>>> 7bafe28 (Fixed Sql Quieries)
 from datetime import datetime
 from django.db import connection
 from django.db.models import Q
 import jdatetime
 import json 
-<<<<<<< HEAD
 from django.db import connection
-=======
->>>>>>> 7bafe28 (Fixed Sql Quieries)
 # RestApi = Api(os.getenv("sms_username"),os.getenv("sms_password")).sms()
 class MarketByCityView(GenericAPIView):
 	queryset = Market
 	def get(self,*args,**kwargs):
 		pk = kwargs["pk"]
-<<<<<<< HEAD
-		qs = Market.objects.filter(city__pk=int(pk),market_type="mo") # حالت مارکتی که مد نظر برای فیلتر را انتخاب کنید 
-		cursor = connection.cursor()
-		cursor.execute("SELECT * from (SELECT marketFeature2.*,marketFeature1.* FROM marketFeature2 JOIN marketFeature1 where marketFeature2.info_id = marketFeature1.id) as X join centers_market WHERE X.market_ptr_id = centers_market.id")
-		rows =cursor.fetchall()
-		return Response(json.loads(rows))
-=======
 		qs = MarketFeature2.objects.filter(city__contains=pk,market_type="mo") # حالت مارکتی که مد نظر برای فیلتر را انتخاب کنید 
 		data = MarketSerializer(qs,many=True)	
 		return Response(data.data)
->>>>>>> 7bafe28 (Fixed Sql Quieries)
 
 class MarketByDateView(GenericAPIView):
 	queryset = Market
 	def get(self,*args,**kwargs):
-<<<<<<< HEAD
-		startTimeString = self.request.query_params.get("date")
-		startTime=datetime.strptime(startTimeString, "%a, %d %b %Y %H:%M:%S %Z")
-		endTimeString = self.request.query_params.get("time")
-		endTime = datetime.strptime(endTimeString, "%a, %d %b %Y %H:%M:%S %Z")
-		qs = Market.objects.filter(Q(marketTimeSlots__start_time__gte=startTime)|Q(marketTimeSlots__start_time__lte=endTime),market_type="mo") # حالت مارکتی که مد نظر برای فیلتر را انتخاب کنید 
-		
-
-		data = MarketSerializer(qs,many=True)
-		return Response(data.data)
-=======
 		day = self.request.query_params.get("date")
 		dayofWeekFilter = Q(time_slots__day_of_week=day)
 		timeString = self.request.query_params.get("time")
@@ -59,7 +32,6 @@ class MarketByDateView(GenericAPIView):
 		qs = MarketFeature2.objects.filter(dayofWeekFilter& startTimeFilter&endTimeFilter)#,,time_slots__end_time__hour__gte=Time
 		markets =MarketSerializer(qs,many=True)
 		return Response(markets.data)
->>>>>>> 7bafe28 (Fixed Sql Quieries)
 		
 class MarketDetailView(RetrieveAPIView,UpdateAPIView):
 	queryset = Market
@@ -68,19 +40,15 @@ class MarketDetailView(RetrieveAPIView,UpdateAPIView):
 		pk = kwargs["pk"]
 		user = self.request.user
 		market = MarketOneTimeSlot.objects.get(id=pk)
-<<<<<<< HEAD
-		cursor = connection.cursor()
-		cursor.execute("SELECT X.h from (SELECT marketFeature2.*,marketFeature1.* FROM marketFeature2 JOIN marketFeature1 where marketFeature2.info_id = marketFeature1.id) as X join centers_market WHERE X.market_ptr_id = centers_market.id")
-		totalReseveCount  =cursor.fetchall()[0]
-=======
 		totalReseveCount  =market.market1.info.h
->>>>>>> 7bafe28 (Fixed Sql Quieries)
-		currentReserve = MarketReserved.objects.get(timeSlot__pk=pk)
+		currentReserve = market.counts
 		currentReserveCount =currentReserve.count
+
 		date = market.date
 		formatedDate = jdatetime.date.fromgregorian(year=date.year,month=date.month,day=date.day)
 		if(currentReserveCount<totalReseveCount):
 			currentReserve.count+=1
+			MarketReserved.objects.create(timeSlot=market,user=user).save()
 			# RestApi.send(user.username,"0911111111",f"رزور شما در تاریخ {market.market.name} در مرکز {formatedDate} با موفقیت انجام شد")
 			market.save()
 			currentReserve.save()
